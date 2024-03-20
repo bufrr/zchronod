@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package zmessage;
+
+service Message {
+    rpc SendZMessage (ZMessage) returns (ZMessage) {}
+}
+
+message ZMessage {
+    uint32 version = 1;
+    ZType type = 2;
+    bytes public_key = 3;
+    bytes data = 4;
+    bytes signature = 5;
+}
+
+enum ZType {
+    Z_TYPE_RNG = 0;
+    Z_TYPE_EVENT = 1;
+}
+
+message Rng {
+    uint32 version = 1;
+    uint64 num = 2;
+    bytes proof = 3;
+}

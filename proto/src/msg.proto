@@ -3,29 +3,17 @@ syntax = "proto3";
 package msg;
 
 message VlcMsg {// type = request, meta is event byt, type = sync , type = terminate
-  string type = 1;
-  bytes  vlcMeta = 2;
-}
-
-message ZMessage {// type = vlc
-  string type = 1;
-  bytes msgMeta = 2;
+    string type = 1;
+    bytes vlc_meta = 2;
 }
 
 message VlcMeta {
-  clock ClockState = 1;
-  bytes  EventMeta = 2;
+    Clock clock_state = 1;
+    bytes event_meta = 2;
 }
 
-message clock {
-  string id = 1;
-  uint64 value = 2;
-  repeated clock ancestors = 3;
+message Clock {
+    string id = 1;
+    uint64 value = 2;
+    repeated Clock ancestors = 3;
 }
-
-//    #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
-//    pub struct Clock {
-//     id: u128,
-//     value: u128,
-//     ancestors: Vec<Clock>,
-//    }

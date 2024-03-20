@@ -1,31 +1,29 @@
 use std::ffi::c_long;
-use tokio::task;
 use std::sync::{Arc, Mutex};
 use std::thread;
+
+use bytes::Bytes;
 use futures::future::ok;
+use libp2p::{
+    gossipsub,
+    gossipsub::Message as mms,
+    mdns, Multiaddr,
+    noise,
+    PeerId, swarm::{NetworkBehaviour, SwarmEvent}, Swarm, tcp, yamux,
+};
 use log::{error, info};
 use prost::bytes::Buf;
 use prost::Message;
+use tokio::runtime::Runtime;
 use tokio::sync::mpsc::error::SendError;
 use tokio::sync::mpsc::Sender;
-use gossipd::gossipd::{Gossipd, GossipdOptions};
-use proto::zchronod::zchronod_server::Zchronod;
-use proto::zchronod::Event;
-use bytes::Bytes;
-use tokio::runtime::Runtime;
+use tokio::task;
 use tonic::codegen::Body;
-use api::RT;
 
-use {
-    libp2p::{
-        gossipsub,
-        gossipsub::Message as mms,
-        mdns, noise,
-        swarm::{NetworkBehaviour, SwarmEvent},
-        tcp, yamux, Multiaddr, PeerId, Swarm,
-    },
-};
-use chronod::Clock;
+use api::RT;
+use chronod::clock;
+use gossipd::gossipd::{Gossipd, GossipdOptions};
+use proto::zchronod::Event;
 
 pub struct GossipServer<T> {
     pub send: Sender<T>,
@@ -33,7 +31,7 @@ pub struct GossipServer<T> {
     pub ip: String,
 }
 
-impl <T: Into<Vec<u8>>> GossipServer<T> {
+impl<T: Into<Vec<u8>>> GossipServer<T> {
     pub fn new(peers: &Vec<String>, listen_address: &str) -> Self {
         let mut gossip_options = GossipdOptions::default();
         gossip_options.listen_addr = listen_address.to_string();
@@ -41,7 +39,7 @@ impl <T: Into<Vec<u8>>> GossipServer<T> {
             info!("add peer {}", peer);
             gossip_options.add_peer(peer.to_string());// format as /ip4/192.168.0.1/tcp/80
         }
-        let mut gossip: Gossipd<T> = Gossipd::new(gossip_options);
+        let gossip: Gossipd<T> = Gossipd::new(gossip_options);
         // gossip.with_handler(|peer_id, message| {
         //     println!("{peer_id}: {}", String::from_utf8_lossy(&message.data))
         // });
@@ -49,7 +47,7 @@ impl <T: Into<Vec<u8>>> GossipServer<T> {
     }
 
 
-    pub fn register_receive(&mut self, f: std::sync::mpsc::Sender<(PeerId,mms)>) {
+    pub fn register_receive(&mut self, f: std::sync::mpsc::Sender<(PeerId, mms)>) {
         self.gossip.register_distributor(f);
     }
 

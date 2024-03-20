@@ -1,5 +1,5 @@
 /// type = request, meta is event byt, type = sync , type = terminate
-
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct VlcMsg {
@@ -8,15 +8,7 @@ pub struct VlcMsg {
     #[prost(bytes = "vec", tag = "2")]
     pub vlc_meta: ::prost::alloc::vec::Vec<u8>,
 }
-/// type = vlc
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ZMessage {
-    #[prost(string, tag = "1")]
-    pub r#type: ::prost::alloc::string::String,
-    #[prost(bytes = "vec", tag = "2")]
-    pub msg_meta: ::prost::alloc::vec::Vec<u8>,
-}
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct VlcMeta {
@@ -25,7 +17,7 @@ pub struct VlcMeta {
     #[prost(bytes = "vec", tag = "2")]
     pub event_meta: ::prost::alloc::vec::Vec<u8>,
 }
-
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Clock {

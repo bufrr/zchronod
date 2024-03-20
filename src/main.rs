@@ -13,6 +13,7 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
 
     // env::set_var("RUST_LOG", "debug");
     // loop1().await;
+    //set()?;
     let matches = set_clap(
         crate_name!(),
         crate_description!(),

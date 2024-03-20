@@ -1,13 +1,13 @@
-//! Verifiable logical clock.
+//! Verifiable logical Clock.
 //!
-//! This crate implements a verifiable logical clock construct. The clock
+//! This crate implements a verifiable logical Clock construct. The Clock
 //! can be used in a peer-to-peer network to order events. Any node in the
-//! network can verify the correctness of the clock.
+//! network can verify the correctness of the Clock.
 
-use serde::{Deserialize, Serialize};
 use std::cmp;
-use prost::Message;
 
+use prost::Message;
+use serde::{Deserialize, Serialize};
 
 /// vlc_type = request / sync
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -49,6 +49,7 @@ pub struct Clock {
     #[prost(message, repeated, tag = "3")]
     pub ancestors: ::prost::alloc::vec::Vec<Clock>,
 }
+
 impl Into<Vec<u8>> for ZMessage {
     fn into(self) -> Vec<u8> {
         let mut buf = Vec::new();
@@ -56,6 +57,7 @@ impl Into<Vec<u8>> for ZMessage {
         buf
     }
 }
+
 impl Into<Vec<u8>> for Clock {
     fn into(self) -> Vec<u8> {
         let mut buf = Vec::new();
@@ -70,8 +72,8 @@ impl PartialOrd for Clock {
         if self.id == other.id {
             return self.value.partial_cmp(&other.value);
         } else {
-            // If current clock is <= to any of the other clock's ancestors,
-            // the clock is ordered before the other clock.
+            // If current Clock is <= to any of the other Clock's ancestors,
+            // the Clock is ordered before the other Clock.
             for anc in &other.ancestors {
                 match self.partial_cmp(anc) {
                     Some(cmp::Ordering::Less) | Some(cmp::Ordering::Equal) => {
@@ -95,7 +97,7 @@ impl PartialOrd for Clock {
 }
 
 impl Clock {
-    /// Create a new clock.
+    /// Create a new Clock.
     pub fn new(id: String) -> Self {
         Self {
             id,
@@ -104,7 +106,7 @@ impl Clock {
         }
     }
 
-    /// Create a new clock that extends other clocks.
+    /// Create a new Clock that extends other clocks.
     pub fn create(id: String, ancestors: &Vec<Clock>) -> Self {
         Self {
             id,
@@ -113,20 +115,20 @@ impl Clock {
         }
     }
 
-    /// Increment the clock
+    /// Increment the Clock
     pub fn inc(&mut self) {
-        // If clock value overflows, panic
+        // If Clock value overflows, panic
         assert_ne!(self.value.checked_add(1), None);
         self.value += 1;
     }
 
-    /// Reset the clock.
+    /// Reset the Clock.
     pub fn clear(&mut self) {
         self.value = 0;
         self.ancestors.clear();
     }
 
-    /// Merge the clock with other clocks.
+    /// Merge the Clock with other clocks.
     pub fn merge(&mut self, others: &Vec<&Clock>) {
         for &clock in others {
             match self.clone().partial_cmp(clock) {
